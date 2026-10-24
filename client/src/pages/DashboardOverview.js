@@ -27,11 +27,20 @@ function DashboardOverview() {
         api.get('/api/donations'),
         api.get('/api/requests')
       ]);
-      setStats(statsRes.data);
-      setInventory(invRes.data);
+      const nextStats = statsRes.data && typeof statsRes.data === 'object' ? statsRes.data : {};
+      const nextInventory = Array.isArray(invRes.data) ? invRes.data : [];
+      const donations = Array.isArray(donationsRes.data) ? donationsRes.data : [];
+      const requests = Array.isArray(requestsRes.data) ? requestsRes.data : [];
+
+      setStats((currentStats) => ({
+        ...currentStats,
+        ...nextStats,
+        lowStockAlerts: Array.isArray(nextStats.lowStockAlerts) ? nextStats.lowStockAlerts : []
+      }));
+      setInventory(nextInventory);
 
       // Map donations to transaction log format
-      const donationLogs = donationsRes.data.map(d => ({
+      const donationLogs = donations.map(d => ({
         id: d._id,
         type: 'donation',
         title: `Donation: +${d.unitsDonated} units of ${d.bloodGroup}`,
@@ -41,7 +50,7 @@ function DashboardOverview() {
       }));
 
       // Map requests to transaction log format
-      const requestLogs = requestsRes.data.map(r => ({
+      const requestLogs = requests.map(r => ({
         id: r._id,
         type: 'request',
         title: `Request: ${r.status} ${r.unitsRequired} units of ${r.bloodGroup}`,

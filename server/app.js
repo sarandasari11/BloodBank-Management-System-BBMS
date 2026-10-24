@@ -31,6 +31,10 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.json({ message: 'Blood Bank Management System API is running' });
+});
+
 // Connect to MongoDB (cached for serverless execution)
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) {
